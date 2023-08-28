@@ -47,13 +47,11 @@ impl ProgressStream {
             if tick.player_quit {
                 return;
             }
-            println!("{}", tick.progress_changed);
             loop {
                 match self.waker.1.try_recv() {
                     Ok(waker) => {
                         if tick.progress_changed {
                             waker.wake_by_ref();
-                            println!("AA\n\n");
                         }
                     }
                     _ => break,

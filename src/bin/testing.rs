@@ -1,6 +1,7 @@
 use async_std::{task, stream::StreamExt};
-use mpris_async::{stream_players, events::PlayerEventsStream, progress::ProgressStream};
+use mpris_async::{stream_players, progress::ProgressStream};
 
+// This is for testing to make sure that everything works like it is supposed to, which it isn't
 fn main() {
     task::block_on(async {
         let mut players = stream_players(100);
