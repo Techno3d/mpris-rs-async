@@ -10,16 +10,16 @@
 //! [`events::PlayerEventsStream`] to track changes.
 
 use std::time::Duration;
-use crate::player_stream::PlayerStream;
+use crate::player::PlayerStream;
 
 use async_std::task;
 
 pub use mpris::{Player, PlayerFinder, PlayerEvents, ProgressTracker, TrackList};
 use mpris::{DBusError, FindingError};
 
-pub mod player_stream;
-pub mod events_stream;
-pub mod progress_stream;
+pub mod player;
+pub mod events;
+pub mod progress;
 
 /// Gets the most active player. If no player exists, this function will wait until one does.
 /// Based of off mpris::PlayerFinder::find_active
