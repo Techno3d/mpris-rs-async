@@ -20,6 +20,7 @@ use mpris::{DBusError, FindingError};
 pub mod player;
 pub mod events;
 pub mod progress;
+pub mod fake_progress;
 
 /// Gets the most active player. If no player exists, this function will wait until one does.
 /// Based of off mpris::PlayerFinder::find_active

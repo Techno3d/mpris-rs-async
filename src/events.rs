@@ -11,6 +11,7 @@ use mpris::{Player, Event, PlayerFinder};
 /// player to avoid creating multiple threads that do the same work.
 #[derive(Debug, Clone)]
 pub struct PlayerEventsStream {
+    // Identity is used because we cannot send player across threads or tasks
     identity: String,
     sender: Sender<Event>,
     reciever: Receiver<Event>,
@@ -20,7 +21,7 @@ pub struct PlayerEventsStream {
 impl PlayerEventsStream {
     /// Creates a new [`PlayerEventsStream`] to track the changes of a player. This function will
     /// spawn a new thread that listens for changes and sends them to the stream and any stream
-    /// cloned from it.
+    /// cloned from it. The thread only closes once the player has quit.
     pub fn new(player: &Player) -> PlayerEventsStream {
         let (s, r) = unbounded();
         let (wake_send, wake_reciev) = unbounded();
@@ -30,7 +31,7 @@ impl PlayerEventsStream {
         return streamer;
     }
 
-    fn events_listener(&self) {
+    fn events_listener(self) {
         let finder = match PlayerFinder::new() {
             Ok(x) => x,
             Err(_) => {

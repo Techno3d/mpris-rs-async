@@ -27,7 +27,12 @@ impl PlayerStream {
                 Ok(x) => x,
                 Err(e) => panic!("Unexpected DBus Error: {}", e),
             };
-            if finder.find_all().unwrap().len() > players_len {
+            let found_players = match finder.find_all() {
+                Ok(x) => x,
+                Err(mpris::FindingError::NoPlayerFound) => continue,
+                Err(mpris::FindingError::DBusError(x)) => panic!("{}", x),
+            };
+            if found_players.len() > players_len {
                 waker.wake_by_ref();
                 return;
             }
