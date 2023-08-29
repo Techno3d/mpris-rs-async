@@ -1,4 +1,5 @@
-//! Used to make [`crate::progress::ProgressStream`] possible.
+//! Used to make [`crate::progress::ProgressStream`] possible. The code is identical to mpris's
+//! Progress.
 use std::time::{Instant, Duration};
 
 use mpris::{LoopStatus, PlaybackStatus, Metadata, Progress};
