@@ -4,7 +4,7 @@ use async_std::{channel::{unbounded, Sender, Receiver}, stream::Stream};
 use mpris::{Player, PlayerFinder, Progress};
 pub use mpris::ProgressTracker;
 
-use crate::fake_progress::FakeProgress;
+use crate::fake_progress::ProgressClone;
 
 
 /// Streams changes from [`ProgressTracker`]. Makes a new thread to track changes from the player.
@@ -18,7 +18,7 @@ pub struct ProgressStream {
 }
 
 enum MaybeProgress {
-    ProgressFake(FakeProgress), Stopped,
+    ProgressFake(ProgressClone), Stopped,
 }
 
 impl ProgressStream {
@@ -62,7 +62,7 @@ impl ProgressStream {
                 loop {
                     match self.waker.1.try_recv() {
                         Ok(waker) => {
-                            match self.progress_channel.0.try_send(MaybeProgress::ProgressFake(FakeProgress::from(tick.progress))) {
+                            match self.progress_channel.0.try_send(MaybeProgress::ProgressFake(ProgressClone::from(tick.progress))) {
                                 Ok(_) => {},
                                 Err(_) => return,
                             };
@@ -79,7 +79,7 @@ impl ProgressStream {
 }
 
 impl Stream for ProgressStream {
-    type Item = FakeProgress;
+    type Item = ProgressClone;
 
     fn poll_next(self: std::pin::Pin<&mut Self>, cx: &mut std::task::Context<'_>) -> std::task::Poll<Option<Self::Item>> {
         match self.waker.0.try_send(cx.waker().clone()) {

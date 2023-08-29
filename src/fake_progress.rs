@@ -7,7 +7,7 @@ use mpris::{LoopStatus, PlaybackStatus, Metadata, Progress};
 /// Used Because Cloning Progress is impossible, making [`crate::progress::ProgressStream`]
 /// impossible for me to implement
 #[derive(Clone)]
-pub struct FakeProgress {
+pub struct ProgressClone {
     pub(crate) metadata: Metadata,
     pub(crate) playback_status: PlaybackStatus,
     pub(crate) shuffle: bool,
@@ -21,9 +21,9 @@ pub struct FakeProgress {
     pub(crate) current_volume: f64,
 }
 
-impl FakeProgress {
+impl ProgressClone {
     pub(crate) fn from(progress: &Progress) -> Self {
-        FakeProgress {
+        ProgressClone {
             metadata: progress.metadata().clone(),
             playback_status: progress.playback_status(),
             shuffle: progress.shuffle(),
