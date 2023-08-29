@@ -1,7 +1,7 @@
 //! Used to make [`crate::progress::ProgressStream`] possible.
 use std::time::{Instant, Duration};
 
-use mpris::{Player, DBusError, LoopStatus, PlaybackStatus, Metadata};
+use mpris::{LoopStatus, PlaybackStatus, Metadata, Progress};
 
 /// Used Because Cloning Progress is impossible, making [`crate::progress::ProgressStream`]
 /// impossible for me to implement
@@ -21,6 +21,18 @@ pub struct FakeProgress {
 }
 
 impl FakeProgress {
+    pub(crate) fn from(progress: &Progress) -> Self {
+        FakeProgress {
+            metadata: progress.metadata().clone(),
+            playback_status: progress.playback_status(),
+            shuffle: progress.shuffle(),
+            loop_status: progress.loop_status(),
+            instant: *progress.created_at(),
+            position: progress.position(),
+            rate: progress.playback_rate(),
+            current_volume: progress.current_volume(),
+        }
+    }
     /// The track metadata at the point in time that this Progress was constructed.
     pub fn metadata(&self) -> &Metadata {
         &self.metadata
