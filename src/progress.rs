@@ -42,7 +42,16 @@ impl ProgressStream {
                 return;
             },
         };
-        let player = finder.find_by_name(&self.identity).unwrap();
+        let player = match finder.find_by_name(&self.identity) {
+            Ok(x) => x,
+            Err(_) => {
+                match self.progress_channel.0.try_send(MaybeProgress::Stopped) {
+                    Ok(_) => {},
+                    Err(_) => return,
+                };
+                return;
+            },
+        };
         let test = player.track_progress(self.interval);
         let mut progress_tracker = match test {
             Ok(x) => x,

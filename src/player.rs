@@ -30,9 +30,10 @@ impl PlayerStream {
             let found_players = match finder.find_all() {
                 Ok(x) => x,
                 Err(mpris::FindingError::NoPlayerFound) => continue,
-                Err(mpris::FindingError::DBusError(x)) => panic!("{}", x),
+                //Err(mpris::FindingError::DBusError(x)) => panic!("{}", x),
+                Err(mpris::FindingError::DBusError(x)) => {eprintln!("DbusError: {}", x); continue;},
             };
-            if found_players.len() > players_len {
+            if found_players.len() != players_len {
                 waker.wake_by_ref();
                 return;
             }
@@ -49,20 +50,51 @@ impl Stream for PlayerStream {
             //Err(e) => panic!("DBus Error: {}", e),
             Err(_) => return Poll::Ready(None),
         };
-
-        let all_players = finder.find_all().unwrap();
-        let new_players = all_players.iter().filter(|x| {
-            let copy_of_players = self.players.iter();
-            for potential_player in copy_of_players {
-                if potential_player.unique_name() == x.unique_name() {
-                    return false;
+        if self.players.len() != 0 {
+            let mut decrement_num = 0;
+            // Filters out dead connections
+            self.players = self.players.iter().filter(|x| {
+                if !x.is_running() {
+                    decrement_num += 1;
                 }
-            }
-            return true;
-        }).map(|x| {finder.find_by_name(x.identity()).unwrap()}).collect::<Vec<Player>>();
+                x.is_running()
+            }).map(|x| {
+                match finder.find_by_name(x.identity()) {
+                    Ok(x) => x,
+                    Err(e) => panic!("Unexpected error. Player may have quit after check. {}", e),
+                }
+            }).collect();
 
-        self.players.extend(new_players);
+            self.index -= decrement_num;
+
+            let all_players = match finder.find_all() {
+                Ok(x) => x,
+                //Err(_) => return Poll::Ready(None),
+                Err(e) => panic!("DBus error? {}", e),
+            };
+
+            //Kind of goofy work around
+            let new_players = all_players.iter().filter(|x| {
+                let copy_of_players = self.players.iter();
+                for potential_player in copy_of_players {
+                    if potential_player.unique_name() == x.unique_name() {
+                        return false;
+                    }
+                }
+                return true;
+            }).map(|x| {finder.find_by_name(x.identity()).unwrap()}).collect::<Vec<Player>>();
+
+            self.players.extend(new_players);
+        } else {
+            let all_players = match finder.find_all() {
+                Ok(x) => x,
+                //Err(_) => return Poll::Ready(None),
+                Err(e) => panic!("DBus error? {}", e),
+            };
+            self.players.extend(all_players);
+        }
         
+        // Basically manually making an iterator
         if self.index < self.players.len() {
             let new_player: Player = finder.find_by_name(self.players.get(self.index).unwrap().identity()).unwrap();
             self.index += 1;
