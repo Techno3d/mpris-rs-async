@@ -2,25 +2,25 @@
 //!
 //! Async version of the mpris crate. 
 //!
-//! Provides async versions of [`PlayerEvents`], [`PlayerFinder`],
-//! and [`ProgressTracker`].
+//! Provides async versions of [`PlayerEvents`](mpris::PlayerEvents), [`PlayerFinder`](mpris::PlayerFinder),
+//! and [`ProgressTracker`](mpris::ProgressTracker).
 //!
 //! # Get started 
 //! Easiest way to get started with mpris is using [`get_active_player`] and then using
 //! [`events::PlayerEventsStream`] to track changes.
+
+pub mod player;
+pub mod events;
+pub mod progress;
+pub mod fake_progress;
+pub use mpris::{Player, Progress, Metadata, TrackList, TrackID};
 
 use std::time::Duration;
 use crate::player::PlayerStream;
 
 use async_std::task;
 
-pub use mpris::{Player, PlayerFinder, PlayerEvents, ProgressTracker, Progress, TrackList, TrackID};
-use mpris::{DBusError, FindingError};
-
-pub mod player;
-pub mod events;
-pub mod progress;
-pub mod fake_progress;
+use mpris::{DBusError, FindingError, PlayerFinder};
 
 /// Gets the most active player. If no player exists, this function will wait until one does.
 /// Based of off [`PlayerFinder::find_active`](PlayerFinder::find_active)

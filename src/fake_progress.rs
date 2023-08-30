@@ -106,7 +106,7 @@ impl ProgressClone {
 
     /// Returns the player's volume as it was at the time of refresh.
     ///
-    /// See: [`Player::get_volume`].
+    /// See: [`Player::get_volume`](mpris::Player::get_volume).
     pub fn current_volume(&self) -> f64 {
         self.current_volume
     }
