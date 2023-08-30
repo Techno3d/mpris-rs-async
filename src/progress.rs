@@ -1,13 +1,16 @@
+//! [`ProgressStream`] handles when changes to progress are sent.
+
 use std::{task::{Waker, Poll}, thread};
 
 use async_std::{channel::{unbounded, Sender, Receiver}, stream::Stream};
-use mpris::{Player, PlayerFinder, Progress};
-pub use mpris::ProgressTracker;
+use mpris::{Player, PlayerFinder};
+pub(crate) use mpris::ProgressTracker;
 
 use crate::fake_progress::ProgressClone;
 
 
 /// Streams changes from [`ProgressTracker`]. Makes a new thread to track changes from the player.
+/// This class will only send progress when it has changed since the last check.
 #[derive(Debug, Clone)]
 pub struct ProgressStream {
     // Cannot share Player, Progress Tick, and TrackList across thread/tasks

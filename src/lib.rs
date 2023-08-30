@@ -14,7 +14,7 @@ use crate::player::PlayerStream;
 
 use async_std::task;
 
-pub use mpris::{Player, PlayerFinder, PlayerEvents, ProgressTracker, TrackList};
+pub use mpris::{Player, PlayerFinder, PlayerEvents, ProgressTracker, Progress, TrackList, TrackID};
 use mpris::{DBusError, FindingError};
 
 pub mod player;
@@ -23,7 +23,7 @@ pub mod progress;
 pub mod fake_progress;
 
 /// Gets the most active player. If no player exists, this function will wait until one does.
-/// Based of off mpris::PlayerFinder::find_active
+/// Based of off [`PlayerFinder::find_active`](PlayerFinder::find_active)
 pub async fn get_active_player(retry_delay: u64) -> Result<Player, DBusError> {
     let finder = match PlayerFinder::new() {
         Ok(x) => x,
@@ -43,7 +43,7 @@ pub async fn get_active_player(retry_delay: u64) -> Result<Player, DBusError> {
 }
 
 /// Gets the first player. If no player exists, this function will wait until one does.
-/// Based of off mpris::PlayerFinder::find_first
+/// Based of off [`PlayerFinder::find_first`](PlayerFinder::find_first)
 pub async fn get_first_player(retry_delay: u64) -> Result<Player, DBusError> {
     let finder = match PlayerFinder::new() {
         Ok(x) => x,
@@ -64,7 +64,7 @@ pub async fn get_first_player(retry_delay: u64) -> Result<Player, DBusError> {
 
 /// Gets all of the avaliable players. If no player exists, this function will wait until one does.
 /// Every `retry_delay` milliseconds it will try for a new connection.
-/// Based of off mpris::PlayerFinder::find_all
+/// Based of off [`PlayerFinder::find_all`](PlayerFinder::find_all)
 pub async fn get_players(retry_delay: u64) -> Result<Vec<Player>, DBusError> {
     let finder = match PlayerFinder::new() {
         Ok(x) => x,

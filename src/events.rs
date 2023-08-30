@@ -7,8 +7,7 @@ use async_std::{channel::{Sender, Receiver, unbounded, TryRecvError}, task, stre
 use mpris::{Player, Event, PlayerFinder};
 
 /// Infinite Stream which tracks the Events emitted by a player. Streams created with new create a
-/// new thread to track events. Use clone instead of new when trying to track changes on the same
-/// player to avoid creating multiple threads that do the same work.
+/// new thread to track events. 
 #[derive(Debug, Clone)]
 pub struct PlayerEventsStream {
     // Identity is used because we cannot send player across threads or tasks
